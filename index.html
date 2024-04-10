@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .calendar {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td {
+            cursor: pointer;
+        }
+        .selected {
+            background-color: #007bff;
+            color: #fff;
+        }
+        #monthName {
+            font-size: 24px;
+            text-align: center;
+            padding: 20px 0;
+            color: #333;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <h1 id="monthName"></h1>
+        <table id="calendarTable">
+            <thead>
+                <tr id="dayNames">
+                    <!-- Day names will be filled dynamically using JavaScript -->
+                </tr>
+            </thead>
+            <tbody id="calendarBody">
+                <!-- Calendar dates will be filled dynamically using JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let selectedDates = []; // Array to store selected dates
+        let currentYear, currentMonth;
+
+        function createCalendar(year, month) {
+            const tableBody = document.getElementById('calendarBody');
+            const monthName = document.getElementById('monthName');
+
+            tableBody.innerHTML = '';
+            selectedDates = JSON.parse(localStorage.getItem('selectedDates')) || [];
+            currentYear = year;
+            currentMonth = month;
+
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month + 1, 0);
+            monthName.textContent = startDate.toLocaleString('default', { month: 'long' });
+
+            // Loop through the days of the week and add day names
+            const dayNamesRow = document.getElementById('dayNames');
+            dayNamesRow.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const th = document.createElement('th');
+                th.textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i];
+                dayNamesRow.appendChild(th);
+            }
+
+            // Calculate the number of empty cells needed at the beginning of the month
+            const startDay = startDate.getDay(); // 0 for Sunday, 1 for Monday, ...
+
+            let date = new Date(startDate);
+            let week = document.createElement('tr');
+
+            // Add empty cells at the beginning if needed
+            for (let i = 0; i < startDay; i++) {
+                const td = document.createElement('td');
+                week.appendChild(td);
+            }
+
+            // Loop through the days of the month
+            while (date <= endDate) {
+                if (date.getDay() === 0 && week.childNodes.length > 0) {
+                    // Add empty cells at the end if needed to complete the row
+                    for (let i = week.childNodes.length; i < 7; i++) {
+                        const td = document.createElement('td');
+                        week.appendChild(td);
+                    }
+                    tableBody.appendChild(week);
+                    week = document.createElement('tr');
+                }
+
+                const td = document.createElement('td');
+                td.textContent = date.getDate();
+                td.dataset.date = date.toISOString().split('T')[0]; // Store date in ISO format
+                td.addEventListener('click', toggleDate);
+                week.appendChild(td);
+
+                date.setDate(date.getDate() + 1);
+            }
+
+            // Add empty cells at the end of the last row if needed
+            while (week.childNodes.length < 7) {
+                const td = document.createElement('td');
+                week.appendChild(td);
+            }
+            tableBody.appendChild(week);
+
+            // Mark selected dates
+            selectedDates.forEach(date => {
+                const td = document.querySelector(`td[data-date="${date}"]`);
+                if (td) {
+                    td.classList.add('selected');
+                }
+            });
+        }
+
+        function toggleDate(event) {
+            const td = event.target;
+            const date = td.dataset.date;
+            const index = selectedDates.indexOf(date);
+
+            if (index === -1) {
+                selectedDates.push(date);
+                td.classList.add('selected');
+            } else {
+                selectedDates.splice(index, 1);
+                td.classList.remove('selected');
+            }
+            localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
+        }
+
+        // Call createCalendar function to display the current month's calendar
+        const currentDate = new Date();
+        createCalendar(currentDate.getFullYear(), currentDate.getMonth());
+
+        // Function to navigate to the previous month
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentYear--;
+                currentMonth = 11;
+            }
+            createCalendar(currentYear, currentMonth);
+        }
+
+        // Function to navigate to the next month
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentYear++;
+                currentMonth = 0;
+            }
+            createCalendar(currentYear, currentMonth);
+        }
+    </script>
+
+    <!-- Buttons to navigate between months -->
+    <button onclick="prevMonth()">Previous Month</button>
+    <button onclick="nextMonth()">Next Month</button>
+</body>
+</html>
