@@ -10,10 +10,19 @@
             margin: 0;
             padding: 20px;
             background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .calendar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 600px;
+            margin-bottom: 20px;
         }
         .calendar {
-            max-width: 600px;
-            margin: 0 auto;
+            flex-grow: 1;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -47,7 +56,7 @@
             background-color: #007bff;
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
             margin-bottom: 10px;
@@ -55,21 +64,36 @@
         button:hover {
             background-color: #0056b3;
         }
+        .prev-button {
+            margin-right: 10px; /* Adjust the margin between buttons and calendar */
+        }
+        .next-button {
+            margin-left: 10px; /* Adjust the margin between buttons and calendar */
+        }
     </style>
 </head>
 <body>
-    <div class="calendar">
-        <h1 id="monthName"></h1>
-        <table id="calendarTable">
-            <thead>
-                <tr id="dayNames">
-                    <!-- Day names will be filled dynamically using JavaScript -->
-                </tr>
-            </thead>
-            <tbody id="calendarBody">
-                <!-- Calendar dates will be filled dynamically using JavaScript -->
-            </tbody>
-        </table>
+    <div class="calendar-container">
+        <!-- Previous Month Button -->
+        <button class="prev-button" onclick="prevMonth()">Previous Month</button>
+
+        <!-- Calendar -->
+        <div class="calendar">
+            <h1 id="monthName"></h1>
+            <table id="calendarTable">
+                <thead>
+                    <tr id="dayNames">
+                        <!-- Day names will be filled dynamically using JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="calendarBody">
+                    <!-- Calendar dates will be filled dynamically using JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Next Month Button -->
+        <button class="next-button" onclick="nextMonth()">Next Month</button>
     </div>
 
     <script>
@@ -186,9 +210,5 @@
             createCalendar(currentYear, currentMonth);
         }
     </script>
-
-    <!-- Buttons to navigate between months -->
-    <button onclick="prevMonth()">Previous Month</button>
-    <button onclick="nextMonth()">Next Month</button>
 </body>
 </html>
